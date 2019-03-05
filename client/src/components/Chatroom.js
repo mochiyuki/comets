@@ -37,13 +37,14 @@ class Chatroom extends Component {
 
   render() {
     return (
-      <div className="chat">
-        <ul>
-          {this.state.messages.map((message, key) => {
-            return <li key={key}>{message.message}</li>;
-          })}
-        </ul>
-        <br />
+      <div className="chat-wrapper">
+        <div className="chat">
+          <ul>
+            {this.state.messages.map((message, key) => {
+              return <li key={key}>{message.message}</li>;
+            })}
+          </ul>
+        </div>
         <form>
           <input
             type="text"
@@ -51,7 +52,6 @@ class Chatroom extends Component {
             value={this.state.message}
             onChange={ev => this.setState({ message: ev.target.value })}
           />
-          <br />
           <button id="sendMessage" type="submit" onClick={this.sendMessage}>
             Send
           </button>

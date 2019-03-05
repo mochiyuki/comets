@@ -107,21 +107,31 @@ app.post("/users/login", (req, res, next) => {
 
 var wishes = [];
 
-io.on("connection", async (socket, user) => {
+io.on("connection", (socket, user) => {
   var user = socket.request.session.user;
   //socket.join = "StarrySky";
   //socket.room = "StarrySky";
   //console.log("you have joined " + socket.room);
+  socket.on("test", async function(data) {
+    console.log(data);
+    const wishes = await Wish.find({});
+    console.log(wishes);
+
+    socket.emit("history", wishes);
+  });
+
+  /*
   try {
     const wishes = await Wish.find({});
     console.log(wishes);
 
-    setInterval(function() {
-      socket.emit("history", wishes);
-    }, 10000);
+    //setInterval(function() {
+    socket.emit("history", wishes);
+    //}, 10000);
   } catch (err) {
     console.error(err);
   }
+*/
 
   socket.on("sendWish", (wish, callback) => {
     const newWish = new Wish({ wish: wish, sender: user });

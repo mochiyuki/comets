@@ -7,7 +7,6 @@ import ChatroomWithSocket from "./Chatroom";
 import "aframe";
 import { Entity, Scene } from "aframe-react";
 import "aframe-particle-system-component";
-import "aframe-glow";
 
 class Home extends Component {
   constructor(props) {
@@ -21,14 +20,17 @@ class Home extends Component {
     };
 
     this.sendWish = this.sendWish.bind(this);
+
     //this.joinRoom = this.joinRoom.bind(this);
     //this.leaveRoom = this.leaveRoom.bind(this);
-    /*
+
+    this.props.socket.emit("test", "hello from server");
+
     this.props.socket.on("history", function(wishes) {
       console.log(wishes);
-      displayRooms(wishes);
+      //displayRooms(wishes);
     });
-
+    /*
     const displayRooms = wishes => {
       //this.setState({ wishes });
       console.log(this.state.wishes);
@@ -46,9 +48,12 @@ class Home extends Component {
     const addRoom = data => {
       this.setState({ wishes: [...this.state.wishes, data] });
       console.log(this.state.wishes);
+      this.interval = setInterval(() => {
+        this.setState({ wishes: this.state.wishes.slice(1) });
+      }, 10000);
     };
   }
-
+  /*
   componentDidMount() {
     console.log("test");
     this.props.socket.on("history", wishes => {
@@ -57,7 +62,7 @@ class Home extends Component {
       console.log(this.state.wishes);
     });
   }
-
+*/
   sendWish(e) {
     e.preventDefault();
 
@@ -115,15 +120,21 @@ class Home extends Component {
     //document.getElementById("joinButton").style.display = "flex";
   };
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   render() {
     return (
       <React.Fragment>
         {this.state.chat === true ? (
-          <>
-            <div>{this.state.currentWish}</div>
-            <button onClick={this.leaveRoom}>Leave room</button>
-            <ChatroomWithSocket style={{ position: "fixed", left: "10%" }} />
-          </>
+          <div id="popChat">
+            <div id="wishName">{this.state.currentWish}</div>
+            <button id="leaveButton" onClick={this.leaveRoom}>
+              Leave room
+            </button>
+            <ChatroomWithSocket />
+          </div>
         ) : (
           <h4> Join a chatroom by clicking on a star </h4>
         )}
@@ -170,29 +181,35 @@ class Home extends Component {
           {this.state.wishes.map((room, key) => {
             return (
               <Entity
-                glow={{ enabled: true, color: "red" }}
                 key={key}
                 value={room.wish.wish}
                 geometry={{
-                  primitive: "box",
-                  width: 0.4,
-                  height: 0.4,
-                  depth: 0.4
+                  primitive: "sphere",
+                  radius: 0.1
                 }}
-                material={{ color: "white", transparent: true, opacity: 1 }}
+                material={{ color: "white", transparent: true, opacity: 0.2 }}
                 position={{
                   x: room.posX,
                   y: room.posY,
                   z: -5
                 }}
                 events={{ click: this.clickRoom }}
-                animation={{
-                  property: "rotation",
-                  to: "0 360 0",
-                  loop: "true",
-                  dur: 10000
+                animation__scale={{
+                  property: "scale",
+                  dir: "alternate",
+                  dur: 1000,
+                  loop: true,
+                  to: "1.1 1.1 1.1"
                 }}
-              />
+              >
+                <Entity
+                  geometry={{
+                    primitive: "sphere",
+                    radius: 0.05
+                  }}
+                  material={{ color: "white" }}
+                />
+              </Entity>
             );
           })}
           <Entity primitive="a-camera">
