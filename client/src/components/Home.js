@@ -7,6 +7,7 @@ import ChatroomWithSocket from "./Chatroom";
 import "aframe";
 import { Entity, Scene } from "aframe-react";
 import "aframe-particle-system-component";
+import "./Custom";
 
 class Home extends Component {
   constructor(props) {
@@ -188,40 +189,56 @@ class Home extends Component {
               color: "#FF0000, #FFFF00"
             }}
           />
-          {this.state.wishes.map((room, key) => {
-            return (
-              <Entity
-                key={key}
-                value={room.wish}
-                geometry={{
-                  primitive: "sphere",
-                  radius: 0.1
-                }}
-                material={{ color: "white", transparent: true, opacity: 0.2 }}
-                position={{
-                  x: room.posX,
-                  y: room.posY,
-                  z: -5
-                }}
-                events={{ click: this.clickRoom }}
-                animation__scale={{
-                  property: "scale",
-                  dir: "alternate",
-                  dur: 1000,
-                  loop: true,
-                  to: "1.1 1.1 1.1"
-                }}
-              >
+          <Entity
+            wireframe
+            primitive="a-octahedron"
+            detail={2}
+            radius={4}
+            position={{ x: 0, y: 0, z: -10.0 }}
+            material={{ color: "white", transparent: true, opacity: 0.5 }}
+            rotation="0 0 0"
+            animation={{
+              property: "rotation",
+              to: "0 360 0",
+              loop: true,
+              dur: 60000
+            }}
+          >
+            {this.state.wishes.map((room, key) => {
+              return (
                 <Entity
+                  key={key}
+                  value={room.wish}
                   geometry={{
                     primitive: "sphere",
-                    radius: 0.05
+                    radius: 0.2
                   }}
-                  material={{ color: "white" }}
-                />
-              </Entity>
-            );
-          })}
+                  material={{ color: "white", transparent: true, opacity: 0.2 }}
+                  position={{
+                    x: room.posX,
+                    y: room.posY,
+                    z: room.posZ
+                  }}
+                  events={{ click: this.clickRoom }}
+                  animation__scale={{
+                    property: "scale",
+                    dir: "alternate",
+                    dur: 1000,
+                    loop: true,
+                    to: "1.1 1.1 1.1"
+                  }}
+                >
+                  <Entity
+                    geometry={{
+                      primitive: "sphere",
+                      radius: 0.1
+                    }}
+                  />
+                </Entity>
+              );
+            })}
+          </Entity>
+
           <Entity primitive="a-camera">
             <Entity
               primitive="a-cursor"

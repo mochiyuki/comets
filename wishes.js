@@ -6,13 +6,23 @@ const WishSchema = new mongoose.Schema({
   posX: {
     type: Number,
     default: function() {
-      return Math.floor(Math.random() * 5);
+      var num = Math.floor(Math.random() * 10) + 1;
+      num *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+      return num;
     }
   },
   posY: {
     type: Number,
     default: function() {
-      return Math.floor(Math.random() * 5);
+      var num = Math.floor(Math.random() * 10) + 1;
+      num *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+      return num;
+    }
+  },
+  posZ: {
+    type: Number,
+    default: function() {
+      return Math.floor(Math.random() * -10);
     }
   },
   date: {
