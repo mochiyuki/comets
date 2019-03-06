@@ -141,11 +141,7 @@ io.on("connection", (socket, user) => {
         return callback(err);
       }
 
-      io.emit("updatewishes", {
-        wish: newWish,
-        posX: Math.floor(Math.random() * 5),
-        posY: Math.floor(Math.random() * 5)
-      });
+      io.emit("updatewishes", newWish);
     });
   });
   //wishes.push(wish);

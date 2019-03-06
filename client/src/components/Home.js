@@ -26,16 +26,21 @@ class Home extends Component {
 
     this.props.socket.emit("test", "hello from server");
 
-    this.props.socket.on("history", function(wishes) {
+    this.props.socket.on("history", wishes => {
       console.log(wishes);
-      //displayRooms(wishes);
+      this.setState({ wishes });
     });
+
     /*
     const displayRooms = wishes => {
       //this.setState({ wishes });
       console.log(this.state.wishes);
     };
 */
+    this.props.socket.on("updatewishes", data => {
+      this.setState({ wishes: [...this.state.wishes.concat(data)] });
+    });
+    /*
     this.props.socket.on("updatewishes", function(data) {
       console.log(data);
       //var newWish = data.wish.wish;
@@ -48,10 +53,13 @@ class Home extends Component {
     const addRoom = data => {
       this.setState({ wishes: [...this.state.wishes, data] });
       console.log(this.state.wishes);
+      
       this.interval = setInterval(() => {
         this.setState({ wishes: this.state.wishes.slice(1) });
       }, 10000);
+      
     };
+    */
   }
   /*
   componentDidMount() {
@@ -111,6 +119,8 @@ class Home extends Component {
     console.log(room);
     //let roomString = JSON.stringify(room);
     //console.log(roomString);
+    let pos = e.target.getAttribute("position");
+    console.log(pos);
     this.props.socket.emit("joinRoom", room);
 
     this.setState({
@@ -182,7 +192,7 @@ class Home extends Component {
             return (
               <Entity
                 key={key}
-                value={room.wish.wish}
+                value={room.wish}
                 geometry={{
                   primitive: "sphere",
                   radius: 0.1
