@@ -105,13 +105,11 @@ app.post("/users/login", (req, res, next) => {
   });
 });
 
-var wishes = [];
+var chatHistory = [];
 
 io.on("connection", (socket, user) => {
   var user = socket.request.session.user;
-  //socket.join = "StarrySky";
-  //socket.room = "StarrySky";
-  //console.log("you have joined " + socket.room);
+
   socket.on("test", async function(data) {
     console.log(data);
     const wishes = await Wish.find({});
@@ -119,20 +117,11 @@ io.on("connection", (socket, user) => {
 
     socket.emit("history", wishes);
   });
-
   /*
-  try {
-    const wishes = await Wish.find({});
-    console.log(wishes);
-
-    //setInterval(function() {
-    socket.emit("history", wishes);
-    //}, 10000);
-  } catch (err) {
-    console.error(err);
-  }
+  setInterval(function() {
+    socket.emit("refresh", "hi client");
+  }, 10000);
 */
-
   socket.on("sendWish", (wish, callback) => {
     const newWish = new Wish({ wish: wish, sender: user });
 
@@ -144,21 +133,23 @@ io.on("connection", (socket, user) => {
       io.emit("updatewishes", newWish);
     });
   });
-  //wishes.push(wish);
 
   socket.on("joinRoom", function(room) {
-    //socket.leave("StarrySky");
     socket.join(room);
     socket.room = room;
     console.log("you joined " + room);
+
+    var historyRoom = chatHistory.filter(function(room) {
+      return room.room === socket.room;
+    });
+    console.log(historyRoom);
+    socket.emit("chatHistory", historyRoom);
   });
 
   socket.on("leaveRoom", function() {
     console.log("you're about to leave " + socket.room);
     socket.leave(socket.room);
     console.log("left room");
-    //socket.room = "StarrySky";
-    //console.log("you're back to the" + socket.room);
   });
 
   socket.on("sendMessage", function(data) {
@@ -167,6 +158,8 @@ io.on("connection", (socket, user) => {
       message: data
     });
     console.log(user);
+    chatHistory.push({ room: socket.room, chat: data });
+    console.log(chatHistory);
   });
 });
 

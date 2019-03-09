@@ -40,6 +40,11 @@ class Chatroom extends Component {
       <div className="chat-wrapper">
         <div className="chat">
           <ul>
+            {this.props.history.map((message, key) => {
+              return <li key={key}>{message.chat.message}</li>;
+            })}
+          </ul>
+          <ul>
             {this.state.messages.map((message, key) => {
               return <li key={key}>{message.message}</li>;
             })}

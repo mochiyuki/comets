@@ -7,7 +7,7 @@ import ChatroomWithSocket from "./Chatroom";
 import "aframe";
 import { Entity, Scene } from "aframe-react";
 import "aframe-particle-system-component";
-import "./Custom";
+//import "./Custom";
 
 class Home extends Component {
   constructor(props) {
@@ -17,7 +17,8 @@ class Home extends Component {
       wish: "",
       wishes: [],
       chat: false,
-      currentWish: ""
+      currentWish: "",
+      previousMessages: []
     };
 
     this.sendWish = this.sendWish.bind(this);
@@ -55,23 +56,28 @@ class Home extends Component {
       this.setState({ wishes: [...this.state.wishes, data] });
       console.log(this.state.wishes);
       
+
       this.interval = setInterval(() => {
         this.setState({ wishes: this.state.wishes.slice(1) });
       }, 10000);
       
     };
     */
-  }
-  /*
-  componentDidMount() {
-    console.log("test");
-    this.props.socket.on("history", wishes => {
-      this.setState({ wishes });
-      console.log(wishes);
+    /*
+    this.props.socket.on("refresh", (data, index) => {
+      console.log(data);
       console.log(this.state.wishes);
+      const wishesList = this.state.wishes;
+      wishesList.splice(index, 1);
+      this.setState({ wishesList });
+    });
+    */
+    this.props.socket.on("chatHistory", previousMessages => {
+      this.setState({ previousMessages });
+      console.log(this.state.previousMessages);
     });
   }
-*/
+
   sendWish(e) {
     e.preventDefault();
 
@@ -131,10 +137,6 @@ class Home extends Component {
     //document.getElementById("joinButton").style.display = "flex";
   };
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
   render() {
     return (
       <React.Fragment>
@@ -144,7 +146,7 @@ class Home extends Component {
             <button id="leaveButton" onClick={this.leaveRoom}>
               Leave room
             </button>
-            <ChatroomWithSocket />
+            <ChatroomWithSocket history={this.state.previousMessages} />
           </div>
         ) : (
           <h4> Join a chatroom by clicking on a star </h4>
@@ -190,12 +192,12 @@ class Home extends Component {
             }}
           />
           <Entity
-            wireframe
             primitive="a-octahedron"
+            wireframe={true}
             detail={2}
             radius={4}
             position={{ x: 0, y: 0, z: -10.0 }}
-            material={{ color: "white", transparent: true, opacity: 0.5 }}
+            material={{ color: "white", transparent: true, opacity: 0.2 }}
             rotation="0 0 0"
             animation={{
               property: "rotation",
@@ -204,6 +206,7 @@ class Home extends Component {
               dur: 60000
             }}
           >
+            <Entity primitive="a-box" width={1} height={1} metalness={2} />
             {this.state.wishes.map((room, key) => {
               return (
                 <Entity
@@ -227,11 +230,30 @@ class Home extends Component {
                     loop: true,
                     to: "1.1 1.1 1.1"
                   }}
+                  animation__color={{
+                    property: "material.opacity",
+                    from: 0.2,
+                    to: 0,
+                    dur: 1000,
+                    delay: 21000
+                  }}
+                  animation__position={{
+                    property: "position",
+                    to: +20,
+                    delay: 60000
+                  }}
                 >
                   <Entity
                     geometry={{
                       primitive: "sphere",
                       radius: 0.1
+                    }}
+                    animation__color={{
+                      property: "material.opacity",
+                      from: 0.2,
+                      to: 0,
+                      dur: 1000,
+                      delay: 21000
                     }}
                   />
                 </Entity>
@@ -239,7 +261,16 @@ class Home extends Component {
             })}
           </Entity>
 
-          <Entity primitive="a-camera">
+          <Entity
+            primitive="a-camera"
+            position="0 1.6 0"
+            animation__focus={{
+              property: "position",
+              dur: 2000,
+              easing: "linear",
+              to: "0 1.6 -5"
+            }}
+          >
             <Entity
               primitive="a-cursor"
               color="#ffd700"
