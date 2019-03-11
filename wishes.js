@@ -28,8 +28,8 @@ const WishSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
-  }
-  //expire: { type: Date, default: Date.now, expires: 60 }
+  },
+  expire: { type: Date, default: Date.now, expires: 60 }
 });
 
 const Wish = mongoose.model("Wish", WishSchema);

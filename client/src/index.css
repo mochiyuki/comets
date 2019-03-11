@@ -13,7 +13,8 @@ code {
     monospace;
 }
 
-#writeWish {
+#writeWish,
+#logoutButton {
   border: none;
   background-color: black;
   color: white;

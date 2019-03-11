@@ -105,6 +105,18 @@ app.post("/users/login", (req, res, next) => {
   });
 });
 
+app.get("/users/logout", function(req, res, next) {
+  if (req.session) {
+    req.session.destroy(function(err) {
+      if (err) {
+        return next(err);
+      } else {
+        return res.json({ loggedOut: true });
+      }
+    });
+  }
+});
+
 var chatHistory = [];
 
 io.on("connection", (socket, user) => {
@@ -112,10 +124,18 @@ io.on("connection", (socket, user) => {
 
   socket.on("test", async function(data) {
     console.log(data);
-    const wishes = await Wish.find({});
-    console.log(wishes);
 
-    socket.emit("history", wishes);
+    try {
+      const wishes = await Wish.find({});
+      //console.log(wishes);
+      socket.emit("history", wishes);
+
+      const myWishes = await Wish.find({ sender: user });
+      console.log(myWishes);
+      socket.emit("myWishesList", myWishes);
+    } catch (err) {
+      console.log("error");
+    }
   });
   /*
   setInterval(function() {
@@ -158,7 +178,7 @@ io.on("connection", (socket, user) => {
       message: data
     });
     console.log(user);
-    chatHistory.push({ room: socket.room, chat: data });
+    chatHistory.push({ room: socket.room, user: user, chat: data });
     console.log(chatHistory);
   });
 });

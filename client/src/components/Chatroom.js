@@ -41,7 +41,11 @@ class Chatroom extends Component {
         <div className="chat">
           <ul>
             {this.props.history.map((message, key) => {
-              return <li key={key}>{message.chat.message}</li>;
+              return (
+                <li key={key}>
+                  {message.user} : {message.chat.message}
+                </li>
+              );
             })}
           </ul>
           <ul>
