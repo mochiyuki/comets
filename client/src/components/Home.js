@@ -36,17 +36,27 @@ class Home extends Component {
     this.props.socket.on("updatewishes", data => {
       this.setState({ wishes: [...this.state.wishes.concat(data)] });
     });
-    /*
-    this.props.socket.on("refresh", (data, index) => {
+
+    this.props.socket.on("refresh", data => {
       console.log(data);
-      console.log(this.state.wishes);
+
       const wishesList = this.state.wishes;
+      var toRemove = data;
+      var index = wishesList.indexOf(toRemove);
       wishesList.splice(index, 1);
       this.setState({ wishesList });
-    });
-    */
 
-    //this.props.socket.on("myWishesList")
+      //const wishesList = [...this.state.wishes];
+      //wishesList.splice(data);
+      //this.setState({ wishesList });
+
+      console.log(this.state.wishes);
+    });
+
+    this.props.socket.on("myWishesList", myWishes => {
+      console.log(myWishes);
+    });
+
     this.props.socket.on("chatHistory", previousMessages => {
       this.setState({ previousMessages });
       //console.log(this.state.previousMessages);

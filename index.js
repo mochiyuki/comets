@@ -14,6 +14,8 @@ const MongoStore = require("connect-mongo")(expressSession);
 
 const cors = require("cors");
 
+const Joi = require("joi");
+
 const User = require("./users");
 
 const Wish = require("./wishes");
@@ -70,23 +72,38 @@ app.get("/users/check-login", (req, res, next) => {
 });
 
 app.post("/users/register", (req, res, next) => {
-  if (
-    req.body.email &&
-    req.body.username &&
-    req.body.password &&
-    req.body.passwordver
-  ) {
-    if (req.body.password === req.body.passwordver) {
-      User.create(req.body, (err, user) => {
-        if (err) {
-          return next(err);
-        } else {
-          req.session.userId = user._id;
-          req.session.user = user.username;
-          res.json({ success: true });
-        }
-      });
-    }
+  const userSchema = Joi.object().keys({
+    username: Joi.string()
+      .min(3)
+      .required(),
+    email: Joi.string()
+      .email({ minDomainAtoms: 2 })
+      .required(),
+    password: Joi.string()
+      .regex(/^[a-zA-Z0-9]{3,30}$/)
+      .required(),
+    passwordver: Joi.any()
+      .valid(Joi.ref("password"))
+      .required()
+      .options({ language: { any: { allowOnly: "must match password" } } })
+  });
+
+  const results = Joi.validate(req.body, userSchema);
+  //console.log(results);
+
+  if (results.error) {
+    res.status(400).send(results.error.details[0].message);
+    return;
+  } else {
+    User.create(req.body, (err, user) => {
+      if (err) {
+        return next(err);
+      } else {
+        req.session.userId = user._id;
+        req.session.user = user.username;
+        res.json({ success: true });
+      }
+    });
   }
 });
 
@@ -131,7 +148,7 @@ io.on("connection", (socket, user) => {
       socket.emit("history", wishes);
 
       const myWishes = await Wish.find({ sender: user });
-      console.log(myWishes);
+      //console.log(myWishes);
       socket.emit("myWishesList", myWishes);
     } catch (err) {
       console.log("error");
@@ -140,7 +157,7 @@ io.on("connection", (socket, user) => {
   /*
   setInterval(function() {
     socket.emit("refresh", "hi client");
-  }, 10000);
+  }, 60000);
 */
   socket.on("sendWish", (wish, callback) => {
     const newWish = new Wish({ wish: wish, sender: user });
@@ -151,6 +168,10 @@ io.on("connection", (socket, user) => {
       }
 
       io.emit("updatewishes", newWish);
+
+      setTimeout(function() {
+        io.emit("refresh", newWish);
+      }, 40000);
     });
   });
 
@@ -180,6 +201,10 @@ io.on("connection", (socket, user) => {
     console.log(user);
     chatHistory.push({ room: socket.room, user: user, chat: data });
     console.log(chatHistory);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(user + " disconnected");
   });
 });
 
