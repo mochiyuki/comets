@@ -10,7 +10,8 @@ class Register extends Component {
       username: "",
       password: "",
       passwordver: "",
-      redirect: false
+      redirect: false,
+      error: ""
     };
     this.handleRegister = this.handleRegister.bind(this);
   }
@@ -37,8 +38,8 @@ class Register extends Component {
           //console.log("success");
           this.setState({ redirect: true });
         } else {
-          console.log("failed");
-          //this.setState({ error: 'try again!'})
+          //console.log("failed");
+          this.setState({ error: res.error });
         }
       });
   }
@@ -76,6 +77,8 @@ class Register extends Component {
         <button type="primary" onClick={this.handleRegister}>
           Register
         </button>
+
+        <p>{this.state.error}</p>
       </>
     );
   }

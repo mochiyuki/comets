@@ -23,8 +23,7 @@ class Home extends Component {
       loggedOut: false
     };
 
-    this.sendWish = this.sendWish.bind(this);
-    this.handleLogout = this.handleLogout.bind(this);
+    this.props.socket.connect();
 
     this.props.socket.emit("test", "hello from server");
 
@@ -37,24 +36,49 @@ class Home extends Component {
       this.setState({ wishes: [...this.state.wishes.concat(data)] });
     });
 
+    this.props.socket.on("myNewestWish", data => {
+      console.log(data.wish);
+      let fixedBar = document.getElementById("fixedBar");
+      //let t = document.createTextNode(data.wish);
+      let wishButton = document.createElement("button");
+      wishButton.value = data.wish;
+      wishButton.innerHTML = data.wish;
+      wishButton.onclick = () => {
+        let room = data.wish;
+        this.props.socket.emit("joinRoom", room);
+
+        this.setState({
+          chat: true,
+          currentWish: room
+        });
+      };
+      fixedBar.appendChild(wishButton);
+
+      let room = data.wish;
+      this.props.socket.emit("joinRoom", room);
+
+      this.setState({
+        chat: true,
+        currentWish: room
+      });
+    });
+
     this.props.socket.on("refresh", data => {
       console.log(data);
 
       const wishesList = this.state.wishes;
-      var toRemove = data;
-      var index = wishesList.indexOf(toRemove);
+      let removeWish = data;
+      let index = wishesList.indexOf(removeWish);
       wishesList.splice(index, 1);
       this.setState({ wishesList });
-
-      //const wishesList = [...this.state.wishes];
-      //wishesList.splice(data);
-      //this.setState({ wishesList });
 
       console.log(this.state.wishes);
     });
 
     this.props.socket.on("myWishesList", myWishes => {
       console.log(myWishes);
+      this.setState({ userWishesList: myWishes });
+      console.log(this.state.userWishesList);
     });
 
     this.props.socket.on("chatHistory", previousMessages => {
@@ -63,16 +87,20 @@ class Home extends Component {
     });
   }
 
-  sendWish(e) {
+  sendWish = e => {
     e.preventDefault();
 
     document.getElementById("wishForm").style.display = "none";
 
-    let wish = this.state.wish;
-    this.props.socket.emit("sendWish", wish);
+    if (this.state.wish !== "") {
+      let wish = this.state.wish;
+      this.props.socket.emit("sendWish", wish);
 
-    this.setState({ wish: "" });
-  }
+      this.setState({ wish: "" });
+    } else {
+      alert("please write a wish");
+    }
+  };
 
   openModal = () => {
     document.getElementById("wishForm").style.display = "flex";
@@ -107,7 +135,19 @@ class Home extends Component {
     });
   };
 
-  handleLogout() {
+  selectRoom = e => {
+    let room = e.target.value;
+    console.log(room);
+
+    this.props.socket.emit("joinRoom", room);
+
+    this.setState({
+      chat: true,
+      currentWish: room
+    });
+  };
+
+  handleLogout = () => {
     fetch("http://localhost:5000/users/logout", {
       method: "GET",
       headers: {
@@ -120,6 +160,11 @@ class Home extends Component {
       .then(res => {
         this.setState({ loggedOut: res.loggedOut });
       });
+    this.props.socket.disconnect();
+  };
+
+  componentWillUnmount() {
+    this.props.socket.removeAllListeners();
   }
 
   render() {
@@ -147,11 +192,13 @@ class Home extends Component {
           ""
         )}
         <div
+          id="fixedBar"
           style={{
             position: "fixed",
             top: "10%",
             cursor: "pointer",
-            zIndex: "100"
+            zIndex: "100",
+            backgroundColor: "red"
           }}
         >
           <button id="logoutButton" onClick={this.handleLogout}>
@@ -160,6 +207,17 @@ class Home extends Component {
           <button id="writeWish" onClick={this.openModal}>
             Write a wish
           </button>
+          <ul>
+            {this.state.userWishesList.map((wish, key) => {
+              return (
+                <li key={key}>
+                  <button value={wish.wish} onClick={this.selectRoom}>
+                    {wish.wish}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </div>
         <div id="wishForm">
           <form>
@@ -232,7 +290,11 @@ class Home extends Component {
                     primitive: "sphere",
                     radius: 0.2
                   }}
-                  material={{ color: "white", transparent: true, opacity: 0.2 }}
+                  material={{
+                    color: "white",
+                    transparent: true,
+                    opacity: 0.2
+                  }}
                   position={{
                     x: room.posX,
                     y: room.posY,

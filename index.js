@@ -92,7 +92,7 @@ app.post("/users/register", (req, res, next) => {
   //console.log(results);
 
   if (results.error) {
-    res.status(400).send(results.error.details[0].message);
+    res.status(400).send({ error: results.error.details[0].message });
     return;
   } else {
     User.create(req.body, (err, user) => {
@@ -168,7 +168,7 @@ io.on("connection", (socket, user) => {
       }
 
       io.emit("updatewishes", newWish);
-
+      socket.emit("myNewestWish", newWish);
       setTimeout(function() {
         io.emit("refresh", newWish);
       }, 40000);

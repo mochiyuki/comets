@@ -14,10 +14,14 @@ class Chatroom extends Component {
 
     this.sendMessage = ev => {
       ev.preventDefault();
-      this.props.socket.emit("sendMessage", {
-        message: this.state.message
-      });
-      this.setState({ message: "" });
+      if (this.state.message !== "") {
+        this.props.socket.emit("sendMessage", {
+          message: this.state.message
+        });
+        this.setState({ message: "" });
+      } else {
+        alert("please write something!");
+      }
     };
 
     this.props.socket.on("receiveMessage", this.addMessage);
