@@ -66,9 +66,9 @@ class Login extends Component {
           <button type="primary" onClick={this.handleLogin}>
             Login
           </button>
-          <button id="redirectRegister">
-            <Link to="/register"> Not a member yet? </Link>
-          </button>
+          <Link to="/register">
+            <button id="redirectRegister"> Not a member yet? </button>
+          </Link>
         </div>
       </>
     );

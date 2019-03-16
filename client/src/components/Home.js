@@ -64,7 +64,7 @@ class Home extends Component {
     });
 
     this.props.socket.on("refresh", data => {
-      console.log(data);
+      //console.log(data);
 
       const wishesList = this.state.wishes;
       let removeWish = data;
@@ -349,7 +349,7 @@ class Home extends Component {
           >
             <Entity
               primitive="a-cursor"
-              color="#ffd700"
+              color="#ffffff"
               animation__click={{
                 property: "scale",
                 startEvents: "click",

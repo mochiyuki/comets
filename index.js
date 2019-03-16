@@ -192,7 +192,7 @@ io.on("connection", (socket, user) => {
     });
 
     //console.log(historyRoom);
-    console.log(historyLikes);
+    //console.log(historyLikes);
     socket.emit("chatHistory", historyRoom);
     socket.emit("likesHistory", historyLikes);
   });
@@ -216,7 +216,7 @@ io.on("connection", (socket, user) => {
 
   //for each click, store the like based on the room
   socket.on("liked", function(data) {
-    console.log(data.count);
+    //console.log(data.count);
     counter.push({ room: socket.room, likes: data.count });
   });
 
