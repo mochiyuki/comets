@@ -3,6 +3,8 @@ import { Redirect, Link } from "react-router-dom";
 
 import SocketContext from "../socketContext";
 
+import logo from "./assets/logo.png";
+
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -13,11 +15,9 @@ class Login extends Component {
       redirect: false,
       error: ""
     };
-
-    this.handleLogin = this.handleLogin.bind(this);
   }
 
-  handleLogin(e) {
+  handleLogin = e => {
     e.preventDefault();
     fetch("http://localhost:5000/users/login", {
       method: "POST",
@@ -34,39 +34,43 @@ class Login extends Component {
       .then(res => res.json())
       .then(res => {
         if (res.type === "success") {
-          //console.log('success');
           this.setState({ redirect: true });
         } else {
-          this.setState({ error: "there is a mistake!" });
+          this.setState({ error: res.error.message });
         }
       });
-  }
+  };
 
   render() {
     return this.state.redirect === true ? (
       <Redirect to="/" />
     ) : (
-      <div id="login-form">
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          onChange={e => this.setState({ username: e.target.value })}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={e => this.setState({ password: e.target.value })}
-        />
-        <span>{this.state.error}</span>
-        <button type="primary" onClick={this.handleLogin}>
-          Login
-        </button>
-        <button>
-          <Link to="/register"> Not a member yet? </Link>
-        </button>
-      </div>
+      <>
+        <div id="login-form">
+          <div className="logo">
+            <img src={logo} alt="comets logo" />
+          </div>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            onChange={e => this.setState({ username: e.target.value })}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            onChange={e => this.setState({ password: e.target.value })}
+          />
+          <span>{this.state.error}</span>
+          <button type="primary" onClick={this.handleLogin}>
+            Login
+          </button>
+          <button id="redirectRegister">
+            <Link to="/register"> Not a member yet? </Link>
+          </button>
+        </div>
+      </>
     );
   }
 }

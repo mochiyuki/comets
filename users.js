@@ -30,7 +30,7 @@ UserSchema.statics.authenticate = (username, password, callback) => {
       if (err) {
         return callback(err);
       } else if (!user) {
-        return callback({ type: "error", message: "User not found" });
+        return callback({ type: "error", message: "user not found" });
       }
 
       bcrypt.compare(password, user.password, (err, res) => {
@@ -45,7 +45,7 @@ UserSchema.statics.authenticate = (username, password, callback) => {
 
           return callback(null, tmp);
         } else {
-          return callback({ type: "error", message: "Wrong password" });
+          return callback({ type: "error", message: "wrong password" });
         }
       });
     }

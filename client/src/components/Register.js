@@ -13,10 +13,9 @@ class Register extends Component {
       redirect: false,
       error: ""
     };
-    this.handleRegister = this.handleRegister.bind(this);
   }
 
-  handleRegister(e) {
+  handleRegister = e => {
     e.preventDefault();
     fetch("http://localhost:5000/users/register", {
       method: "POST",
@@ -35,20 +34,18 @@ class Register extends Component {
       .then(res => res.json())
       .then(res => {
         if (res.success === true) {
-          //console.log("success");
           this.setState({ redirect: true });
         } else {
-          //console.log("failed");
           this.setState({ error: res.error });
         }
       });
-  }
+  };
 
   render() {
     return this.state.redirect === true ? (
       <Redirect to="/login" />
     ) : (
-      <>
+      <div id="register-form">
         <input
           type="email"
           name="email"
@@ -77,9 +74,8 @@ class Register extends Component {
         <button type="primary" onClick={this.handleRegister}>
           Register
         </button>
-
-        <p>{this.state.error}</p>
-      </>
+        <span>{this.state.error}</span>
+      </div>
     );
   }
 }

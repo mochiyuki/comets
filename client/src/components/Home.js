@@ -25,10 +25,10 @@ class Home extends Component {
 
     this.props.socket.connect();
 
-    this.props.socket.emit("test", "hello from server");
+    this.props.socket.emit("initiate", "hello from client");
 
     this.props.socket.on("history", wishes => {
-      console.log(wishes);
+      //console.log(wishes);
       this.setState({ wishes });
     });
 
@@ -36,8 +36,9 @@ class Home extends Component {
       this.setState({ wishes: [...this.state.wishes.concat(data)] });
     });
 
+    //create a button for each of the sender's wishes, so the user can join his own wish rooms easier since orbiting rooms are randomly positioned
     this.props.socket.on("myNewestWish", data => {
-      console.log(data.wish);
+      //console.log(data.wish);
       let wishList = document.getElementById("wishList");
       let wishButton = document.createElement("button");
       wishButton.value = data.wish;
@@ -71,13 +72,13 @@ class Home extends Component {
       wishesList.splice(index, 1);
       this.setState({ wishesList });
 
-      console.log(this.state.wishes);
+      //console.log(this.state.wishes);
     });
 
     this.props.socket.on("myWishesList", myWishes => {
-      console.log(myWishes);
+      //console.log(myWishes);
       this.setState({ userWishesList: myWishes });
-      console.log(this.state.userWishesList);
+      //console.log(this.state.userWishesList);
     });
 
     this.props.socket.on("chatHistory", previousMessages => {
@@ -218,7 +219,8 @@ class Home extends Component {
               placeholder="What's your wish?"
               value={this.state.wish}
               onChange={ev => this.setState({ wish: ev.target.value })}
-              rows="10"
+              rows="5"
+              cols="40"
             />
             <br />
             <button id="sendButton" onClick={this.sendWish}>
@@ -265,7 +267,7 @@ class Home extends Component {
             }}
             animation__fadein={{
               property: "material.opacity",
-              dur: 5000,
+              dur: 4000,
               from: 0,
               to: 0.2
             }}
@@ -275,7 +277,12 @@ class Home extends Component {
               width={1}
               height={1}
               metalness={1}
-              rotation={"45 90 180"}
+              animation__rotate={{
+                property: "rotation",
+                dur: 30000,
+                loop: true,
+                to: "360 360 360"
+              }}
             />
             {this.state.wishes.map((room, key) => {
               return (

@@ -37,7 +37,7 @@ class AuthRoute extends Component {
         {...Props}
         render={routeProps =>
           this.state.isLogged === null ? (
-            <p>Loading</p>
+            ""
           ) : this.state.isLogged === true ? (
             <Component {...routeProps} />
           ) : (

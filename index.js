@@ -110,7 +110,7 @@ app.post("/users/register", (req, res, next) => {
 app.post("/users/login", (req, res, next) => {
   User.authenticate(req.body.username, req.body.password, (err, user) => {
     if (err || !user) {
-      return res.status(401).json(err);
+      return res.status(401).send({ error: err });
     } else {
       req.session.userId = user._id;
       req.session.user = user.username;
@@ -134,14 +134,18 @@ app.get("/users/logout", function(req, res, next) {
   }
 });
 
+//an array to store previousMessages in a chatroom based on the room name
 var chatHistory = [];
+
+//an array to store likes counter based on the room name
 var counter = [];
 
 io.on("connection", (socket, user) => {
   var user = socket.request.session.user;
 
-  socket.on("test", async function(data) {
-    console.log(data);
+  //listen first time from client so server can gather data (all wishes, and connected user's wishes) from database and send it back to client
+  socket.on("initiate", async function(data) {
+    //console.log(data);
 
     try {
       const wishes = await Wish.find({});
@@ -155,11 +159,8 @@ io.on("connection", (socket, user) => {
       console.log("error");
     }
   });
-  /*
-  setInterval(function() {
-    socket.emit("refresh", "hi client");
-  }, 60000);
-*/
+
+  //save each wish in database, up this wish in client, show it if it's a connected user's wish, finally a setTimeout to send an event to client telling it to remove this wish after x time
   socket.on("sendWish", (wish, callback) => {
     const newWish = new Wish({ wish: wish, sender: user });
 
@@ -172,10 +173,11 @@ io.on("connection", (socket, user) => {
       socket.emit("myNewestWish", newWish);
       setTimeout(function() {
         io.emit("refresh", newWish);
-      }, 40000);
+      }, 300000);
     });
   });
 
+  //joining a room, showing its previousMessages and likes counter based on object property room value
   socket.on("joinRoom", function(room) {
     socket.join(room);
     socket.room = room;
@@ -201,6 +203,7 @@ io.on("connection", (socket, user) => {
     console.log("left room");
   });
 
+  //when messages are sent, store them in the array
   socket.on("sendMessage", function(data) {
     io.sockets["in"](socket.room).emit("receiveMessage", {
       user: user,
@@ -211,7 +214,8 @@ io.on("connection", (socket, user) => {
     //console.log(chatHistory);
   });
 
-  socket.on("clicked", function(data) {
+  //for each click, store the like based on the room
+  socket.on("liked", function(data) {
     console.log(data.count);
     counter.push({ room: socket.room, likes: data.count });
   });

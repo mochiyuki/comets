@@ -15,8 +15,8 @@ class Chatroom extends Component {
       sum: null
     };
 
-    this.sendMessage = ev => {
-      ev.preventDefault();
+    this.sendMessage = e => {
+      e.preventDefault();
       if (this.state.message !== "") {
         this.props.socket.emit("sendMessage", {
           message: this.state.message
@@ -29,16 +29,17 @@ class Chatroom extends Component {
 
     this.props.socket.on("receiveMessage", this.addMessage);
 
+    //received the array from server, sum object property values by likes
     this.props.socket.on("likesHistory", count => {
-      console.log(count);
+      //console.log(count);
 
-      let testtt = count
-        .map(item => item.likes)
+      let totalLikes = count
+        .map(objprop => objprop.likes)
         .reduce((prev, next) => prev + next, 0);
-      //console.log(testtt);
+      //console.log(totalLikes);
 
-      this.setState({ sum: testtt });
-      console.log(this.state.sum);
+      this.setState({ sum: totalLikes });
+      //console.log(this.state.sum);
     });
   }
 
@@ -53,7 +54,7 @@ class Chatroom extends Component {
   handleLike = e => {
     e.preventDefault();
     this.setState({ liked: true, count: this.state.count + 1 });
-    this.props.socket.emit("clicked", { count: this.state.count + 1 });
+    this.props.socket.emit("liked", { count: this.state.count + 1 });
   };
 
   componentWillUnmount = () => {
@@ -84,7 +85,7 @@ class Chatroom extends Component {
             type="text"
             placeholder="Type..."
             value={this.state.message}
-            onChange={ev => this.setState({ message: ev.target.value })}
+            onChange={e => this.setState({ message: e.target.value })}
           />
           <button id="sendMessage" type="submit" onClick={this.sendMessage}>
             Send
