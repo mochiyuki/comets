@@ -135,6 +135,7 @@ app.get("/users/logout", function(req, res, next) {
 });
 
 var chatHistory = [];
+var counter = [];
 
 io.on("connection", (socket, user) => {
   var user = socket.request.session.user;
@@ -183,8 +184,15 @@ io.on("connection", (socket, user) => {
     var historyRoom = chatHistory.filter(function(room) {
       return room.room === socket.room;
     });
-    console.log(historyRoom);
+
+    var historyLikes = counter.filter(function(room) {
+      return room.room === socket.room;
+    });
+
+    //console.log(historyRoom);
+    console.log(historyLikes);
     socket.emit("chatHistory", historyRoom);
+    socket.emit("likesHistory", historyLikes);
   });
 
   socket.on("leaveRoom", function() {
@@ -198,9 +206,14 @@ io.on("connection", (socket, user) => {
       user: user,
       message: data
     });
-    console.log(user);
+    //console.log(user);
     chatHistory.push({ room: socket.room, user: user, chat: data });
-    console.log(chatHistory);
+    //console.log(chatHistory);
+  });
+
+  socket.on("clicked", function(data) {
+    console.log(data.count);
+    counter.push({ room: socket.room, likes: data.count });
   });
 
   socket.on("disconnect", () => {

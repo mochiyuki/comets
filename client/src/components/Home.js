@@ -38,11 +38,10 @@ class Home extends Component {
 
     this.props.socket.on("myNewestWish", data => {
       console.log(data.wish);
-      let fixedBar = document.getElementById("fixedBar");
-      //let t = document.createTextNode(data.wish);
+      let wishList = document.getElementById("wishList");
       let wishButton = document.createElement("button");
       wishButton.value = data.wish;
-      wishButton.innerHTML = data.wish;
+      wishButton.setAttribute("id", "userWish");
       wishButton.onclick = () => {
         let room = data.wish;
         this.props.socket.emit("joinRoom", room);
@@ -52,7 +51,7 @@ class Home extends Component {
           currentWish: room
         });
       };
-      fixedBar.appendChild(wishButton);
+      wishList.appendChild(wishButton);
 
       let room = data.wish;
       this.props.socket.emit("joinRoom", room);
@@ -191,29 +190,22 @@ class Home extends Component {
         ) : (
           ""
         )}
-        <div
-          id="fixedBar"
-          style={{
-            position: "fixed",
-            top: "10%",
-            cursor: "pointer",
-            zIndex: "100",
-            backgroundColor: "red"
-          }}
-        >
+        <div id="fixedBar">
           <button id="logoutButton" onClick={this.handleLogout}>
             Log out
           </button>
           <button id="writeWish" onClick={this.openModal}>
             Write a wish
           </button>
-          <ul>
+          <ul id="wishList">
             {this.state.userWishesList.map((wish, key) => {
               return (
                 <li key={key}>
-                  <button value={wish.wish} onClick={this.selectRoom}>
-                    {wish.wish}
-                  </button>
+                  <button
+                    id="userWish"
+                    value={wish.wish}
+                    onClick={this.selectRoom}
+                  />
                 </li>
               );
             })}
@@ -239,11 +231,15 @@ class Home extends Component {
         </div>
         <Scene background={{ color: "black" }}>
           <Entity
+            light={{ type: "directional", color: "white", intensity: 1 }}
+            position="-1 1 0"
+          />
+          <Entity
             particle-system={{
               preset: "dust",
               maxAge: "20",
               particleCount: 100,
-              color: "#0000ff, #ff00ff"
+              color: "#ffffff, #c0c0c0"
             }}
           />
           <Entity

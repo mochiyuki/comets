@@ -13,6 +13,10 @@ code {
     monospace;
 }
 
+button {
+  outline: none;
+}
+
 #writeWish,
 #logoutButton {
   border: none;
@@ -70,26 +74,33 @@ code {
   top: 0;
   left: 0;
   z-index: 999;
-  background-color: orange;
+  background-color: transparent;
 }
 
 #wishName {
   width: 100%;
   height: 16vh;
-  background-color: pink;
+  background-color: black;
+  color: white;
+  padding-top: 4px;
+  padding-left: 10px;
 }
 
 #leaveButton {
   width: 100%;
   height: 4vh;
-  background-color: green;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: white;
+  outline: none;
 }
 
 .chat-wrapper {
   width: 100%;
   height: 80vh;
   z-index: 999;
-  background-color: orange;
+  background-color: transparent;
 }
 
 .chat-wrapper form {
@@ -100,24 +111,25 @@ code {
 }
 
 .chat-wrapper input {
-  width: 100%;
+  width: 96%;
+  margin-left: 2%;
   height: 5vh;
 }
 
 .chat {
-  width: 80%;
+  width: 100%;
   height: 60vh;
   display: flex;
   flex-direction: column-reverse;
   overflow: auto;
-  background-color: blue;
+  background-color: transparent;
   z-index: 999;
 }
 
 ul {
-  background-color: purple;
   z-index: 999;
   list-style: none;
+  color: white;
 }
 
 #sendMessage {
@@ -126,12 +138,66 @@ ul {
   background-color: transparent;
   color: white;
   border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+#like-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 10vw;
+  color: white;
+  padding-top: 4px;
+}
+
+#like-wrapper button {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  margin-right: 6px;
+  background-color: white;
+}
+
+#fixedBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  z-index: 100;
+  background-color: black;
+}
+
+#wishList {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: space-around;
+  margin-top: 20px;
+}
+
+#userWish {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
 }
 
 #login-form {
   width: 100%;
   height: 100vh;
-  background-color: #fff9e8;
+  background-color: black;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
@@ -141,14 +207,21 @@ ul {
 
 #login-form input {
   border: none;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid white;
   background-color: transparent;
   margin-top: 20px;
+  color: white;
+  outline: none;
 }
 
 #login-form button {
-  border: 1px solid black;
+  border: 1px solid white;
   background-color: white;
   opacity: 0.5;
   margin-top: 40px;
+  cursor: pointer;
+}
+
+span {
+  color: white;
 }

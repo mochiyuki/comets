@@ -9,7 +9,10 @@ class Chatroom extends Component {
     this.state = {
       username: "",
       message: "",
-      messages: []
+      messages: [],
+      liked: false,
+      count: null,
+      sum: null
     };
 
     this.sendMessage = ev => {
@@ -25,6 +28,18 @@ class Chatroom extends Component {
     };
 
     this.props.socket.on("receiveMessage", this.addMessage);
+
+    this.props.socket.on("likesHistory", count => {
+      console.log(count);
+
+      let testtt = count
+        .map(item => item.likes)
+        .reduce((prev, next) => prev + next, 0);
+      //console.log(testtt);
+
+      this.setState({ sum: testtt });
+      console.log(this.state.sum);
+    });
   }
 
   addMessage = data => {
@@ -35,8 +50,15 @@ class Chatroom extends Component {
     //console.log(this.state.messages);
   };
 
+  handleLike = e => {
+    e.preventDefault();
+    this.setState({ liked: true, count: this.state.count + 1 });
+    this.props.socket.emit("clicked", { count: this.state.count + 1 });
+  };
+
   componentWillUnmount = () => {
     this.props.socket.removeListener("receiveMessage", this.addMessage);
+    this.props.socket.removeListener("likesHistory");
   };
 
   render() {
@@ -51,8 +73,7 @@ class Chatroom extends Component {
                 </li>
               );
             })}
-          </ul>
-          <ul>
+
             {this.state.messages.map((message, key) => {
               return <li key={key}>{message.message}</li>;
             })}
@@ -68,6 +89,16 @@ class Chatroom extends Component {
           <button id="sendMessage" type="submit" onClick={this.sendMessage}>
             Send
           </button>
+          <div id="like-wrapper">
+            <button
+              type="primary"
+              disabled={this.state.liked}
+              onClick={this.handleLike}
+            >
+              Like
+            </button>
+            <p>{this.state.sum}</p>
+          </div>
         </form>
       </div>
     );
