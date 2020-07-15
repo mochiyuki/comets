@@ -14,6 +14,7 @@ client
 
 `npm run dev`
 
+NB: Works with Firefox, recently had trouble with Chrome so need to fix it.
 Special thanks for this shortcut,
 Merci [@Hélène](https://github.com/lnj-picard) pour le code et [@Stephen](https://github.com/SC-74) pour l'avoir implémenté !
 
